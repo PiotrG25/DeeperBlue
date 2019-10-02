@@ -1,8 +1,13 @@
 package chess_pieces;
 
-public class Rook implements ChessPiece{
+public class Rook extends ChessPiece{
 
 
+
+    @Override
+    public int[][] getPossibleMoves(boolean[][] freeSpace) {
+
+    }
 
     @Override
     public int points() {
