@@ -1,18 +1,30 @@
 package chess_pieces;
 
+import java.util.List;
+
 public abstract class ChessPiece {
 
-    private int x, y;
+    protected int xPos, yPos;
+    protected boolean isWhite;
 
 
-    public int getPosX() { return x; }
-    public int getPosY() { return y; }
-    public void setPosition(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public ChessPiece(int xPos, int yPos, boolean isWhite) {
+        this.xPos = xPos;
+        this.yPos = yPos;
+        this.isWhite = isWhite;
     }
 
+
+    public int getXPos() { return xPos; }
+    public int getYPos() { return yPos; }
+    public void setPosition(int xPos, int yPos) {
+        this.xPos = xPos;
+        this.yPos = yPos;
+    }
+
+
     public abstract int points();
-    public abstract int [][] getPossibleMoves(boolean [][] freeSpace);
+    public abstract List<int []> getPossibleMoves(boolean [][] freeSpace, boolean [][] opponents);
+    //public abstract List<int []> getPossibleSpecialMoves();
 
 }
