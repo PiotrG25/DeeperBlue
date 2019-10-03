@@ -10,6 +10,7 @@ public class Knight extends ChessPiece{
         super(xPos, yPos, isWhite);
     }
 
+
     @Override
     public List<int[]> getPossibleMoves(boolean[][] freeSpace, boolean[][] opponents) {
         List<int []> moves = new ArrayList<>();
