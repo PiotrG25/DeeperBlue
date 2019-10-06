@@ -5,6 +5,10 @@ import java.util.List;
 
 public class King extends ChessPiece{
 
+    //todo check
+    //todo castling
+    // Castling may only be performed if the king and rook involved have never previously been moved in the game, if the king is not in check, if the king would not travel through or into check, and if there are no pieces between the rook and the king
+
 
     public King(int xPos, int yPos, boolean isWhite) {
         super(xPos, yPos, isWhite);
