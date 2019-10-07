@@ -5,8 +5,6 @@ import java.util.List;
 
 public class Pawn extends ChessPiece{
 
-    //todo en passant
-    //todo promotion
 
     public Pawn(int xPos, int yPos, boolean isWhite) {
         super(xPos, yPos, isWhite);
