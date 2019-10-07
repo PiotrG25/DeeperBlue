@@ -22,6 +22,7 @@ public abstract class ChessPiece {
         this.yPos = yPos;
     }
 
+    public boolean isWhite() { return isWhite; }
 
     public abstract int points();
     public abstract List<int []> getPossibleMoves(boolean [][] freeSpace, boolean [][] opponents);
