@@ -24,6 +24,15 @@ public abstract class ChessPiece {
 
     public boolean isWhite() { return isWhite; }
 
+    public String moveCommunicate(int oldX, int oldY, int newX, int newY){
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("move ").append(isWhite ? "white " : "black ").append(this.getClass())
+                .append(" from: ").append(oldX).append(' ').append(oldX)
+                .append(" to: ").append(newX).append(' ').append(newY);
+        return sb.toString();
+    }
+
     public abstract int points();
     public abstract List<int []> getPossibleMoves(boolean [][] freeSpace, boolean [][] opponents);
     //public abstract List<int []> getPossibleSpecialMoves();

@@ -10,6 +10,9 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         List<ChessPiece> chessPieces = new ArrayList<>();
         setupBoard(chessPieces);
+
+        chessPieces.remove(null);
+
         boolean [][] white = getWhite(chessPieces), black = getBlack(chessPieces), freeSpace = getFreeSpace(chessPieces);
         for(boolean [] c : white){
             System.out.println(Arrays.toString(c));
@@ -22,11 +25,101 @@ public class Main {
         for(boolean [] c : freeSpace){
             System.out.println(Arrays.toString(c));
         }
+
     }
 
-//    private static void moveAndDecide(List<ChessPiece> chessPieces, boolean maxi, int lvl){
-//        for(int i = 0; i < )
-//    }
+    private static int moveAndDecide(List<ChessPiece> chessPieces, boolean maxi, int points, int lvl){
+        //todo basic cases
+        //todo divide into 2 methods for white and black player
+        boolean [][] freeSpace = getFreeSpace(chessPieces);
+        if(maxi){
+            int max = -999_999;
+            // white player is maximizing
+            boolean [][] black = getBlack(chessPieces);
+
+            for(ChessPiece cp : chessPieces){
+                List<int []> moves = cp.getPossibleMoves(freeSpace, black);
+                int xStart = cp.getXPos(), yStart = cp.getYPos();
+
+                for(int [] m : moves){
+
+                    cp.setPosition(m[0], m[1]);
+
+                    if(black[m[0]][m[1]]){
+                        ChessPiece captured = null;
+                        // find captured
+                        for(ChessPiece c : chessPieces){
+                            if(!c.isWhite() && c.getXPos() == m[0] && c.getYPos() == m[1]){
+                                captured = c;
+                                break;
+                            }
+                        }
+                        chessPieces.remove(captured);
+
+                        int someValue = moveAndDecide(chessPieces, !maxi, points, lvl - 1);
+                        if(someValue > max){
+                            max = someValue;
+                        }
+
+                        chessPieces.add(captured);
+                        cp.setPosition(xStart, yStart);
+                    }else{
+
+                        int someValue = moveAndDecide(chessPieces, !maxi, points, lvl - 1);
+                        if(someValue > max){
+                            max = someValue;
+                        }
+                        cp.setPosition(xStart, yStart);
+                    }
+
+                }
+            }
+
+            return max;
+        }else{
+            int min = 999_999;
+            // black player is minimizing
+            boolean [][] white = getWhite(chessPieces);
+
+            for(ChessPiece cp : chessPieces){
+                List<int []> moves = cp.getPossibleMoves(freeSpace, white);
+                int xStart = cp.getXPos(), yStart = cp.getYPos();
+
+                for(int [] m : moves){
+
+                    cp.setPosition(m[0], m[1]);
+
+                    if(white[m[0]][m[1]]){
+                        ChessPiece captured = null;
+                        // find captured
+                        for(ChessPiece c : chessPieces){
+                            if(c.isWhite() && c.getXPos() == m[0] && c.getYPos() == m[1]){
+                                captured = c;
+                                break;
+                            }
+                        }
+                        chessPieces.remove(captured);
+
+                        int someValue = moveAndDecide(chessPieces, !maxi, points, lvl - 1);
+                        if(someValue < min){
+                            min = someValue;
+                        }
+
+                        chessPieces.add(captured);
+                        cp.setPosition(xStart, yStart);
+                    }else{
+
+                        int someValue = moveAndDecide(chessPieces, !maxi, points, lvl - 1);
+                        if(someValue < min){
+                            min = someValue;
+                        }
+                        cp.setPosition(xStart, yStart);
+                    }
+                }
+            }
+            return min;
+        }
+    }
 
     private static void setupBoard(List<ChessPiece> chessPieces){
         for(int i = 0; i < 8; i++){
