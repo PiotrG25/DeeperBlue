@@ -1,7 +1,6 @@
 import chess_pieces.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -10,115 +9,115 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         List<ChessPiece> chessPieces = new ArrayList<>();
         setupBoard(chessPieces);
-
-        chessPieces.remove(null);
-
-        boolean [][] white = getWhite(chessPieces), black = getBlack(chessPieces), freeSpace = getFreeSpace(chessPieces);
-        for(boolean [] c : white){
-            System.out.println(Arrays.toString(c));
-        }
-        System.out.println();
-        for(boolean [] c : black){
-            System.out.println(Arrays.toString(c));
-        }
-        System.out.println();
-        for(boolean [] c : freeSpace){
-            System.out.println(Arrays.toString(c));
-        }
-
+        
     }
 
+    private static int maximizingMove(List<ChessPiece> chessPieces, int points, int lvl){
+        boolean [][] freeSpace = getFreeSpace(chessPieces);
+        int max = -999_999; // white player is maximizing
+        String maxCommunicate = "UwU";
+        boolean [][] black = getBlack(chessPieces);
+
+        for(ChessPiece cp : chessPieces){
+            List<int []> moves = cp.getPossibleMoves(freeSpace, black);
+            int xStart = cp.getXPos(), yStart = cp.getYPos();
+
+            List<ChessPiece> chessPieces2 = new ArrayList<>();
+            chessPieces2.addAll(chessPieces);
+
+            for(int [] m : moves){
+
+                cp.setPosition(m[0], m[1]);
+                // if captured
+                ChessPiece captured = findCaptured(chessPieces2, false, m[0], m[1]);
+                if(captured != null){
+                    chessPieces2.remove(captured);
+                    points += captured.points();
+                }
+
+                int someValue;
+                if(lvl <= 1){
+                    someValue = points;
+                }else{
+                    someValue = minimizingMove(chessPieces2, points, lvl - 1);
+                }
+
+                if(someValue > max){
+                    max = someValue;
+                    maxCommunicate = cp.moveCommunicate(xStart, yStart, m[0], m[1]);
+                }
+
+                if(captured != null){
+                    chessPieces2.add(captured);
+                    points -= captured.points();
+                }
+                cp.setPosition(xStart, yStart);
+            }
+        }
+        if(lvl <= 1)
+            System.out.println("lvl " + lvl + " " + maxCommunicate);
+        return max;
+    }
+    private static int minimizingMove(List<ChessPiece> chessPieces, int points, int lvl) {
+        boolean [][] freeSpace = getFreeSpace(chessPieces);
+        int min = 999_999; // black player is minimizing
+        String minCommunicate = "UwU";
+        boolean [][] white = getWhite(chessPieces);
+
+        for(ChessPiece cp : chessPieces){
+            if(cp.isWhite()) continue;
+            List<int []> moves = cp.getPossibleMoves(freeSpace, white);
+            int xStart = cp.getXPos(), yStart = cp.getYPos();
+
+            List<ChessPiece> chessPieces2 = new ArrayList<>();
+            chessPieces2.addAll(chessPieces);
+
+            for(int [] m : moves){
+
+                cp.setPosition(m[0], m[1]);
+                // if captured
+                ChessPiece captured = findCaptured(chessPieces2, true, m[0], m[1]);
+                if(captured != null){
+                    chessPieces2.remove(captured);
+                    points -= captured.points();
+                }
+
+                int someValue;
+                if(lvl <= 1){
+                    someValue = points;
+                }else{
+                    someValue = minimizingMove(chessPieces2, points, lvl - 1);
+                }
+
+                if(someValue < min){
+                    min = someValue;
+                    minCommunicate = cp.moveCommunicate(xStart, yStart, m[0], m[1]);
+                }
+
+                if(captured != null){
+                    chessPieces2.add(captured);
+                    points += captured.points();
+                }
+                cp.setPosition(xStart, yStart);
+            }
+        }
+        if(lvl <= 1)
+            System.out.println("lvl " + lvl + " " + minCommunicate);
+        return min;
+    }
     private static int moveAndDecide(List<ChessPiece> chessPieces, boolean maxi, int points, int lvl){
         //todo basic cases
         //todo divide into 2 methods for white and black player
-        boolean [][] freeSpace = getFreeSpace(chessPieces);
-        if(maxi){
-            int max = -999_999;
-            // white player is maximizing
-            boolean [][] black = getBlack(chessPieces);
+        return 0;
+    }
 
-            for(ChessPiece cp : chessPieces){
-                List<int []> moves = cp.getPossibleMoves(freeSpace, black);
-                int xStart = cp.getXPos(), yStart = cp.getYPos();
-
-                for(int [] m : moves){
-
-                    cp.setPosition(m[0], m[1]);
-
-                    if(black[m[0]][m[1]]){
-                        ChessPiece captured = null;
-                        // find captured
-                        for(ChessPiece c : chessPieces){
-                            if(!c.isWhite() && c.getXPos() == m[0] && c.getYPos() == m[1]){
-                                captured = c;
-                                break;
-                            }
-                        }
-                        chessPieces.remove(captured);
-
-                        int someValue = moveAndDecide(chessPieces, !maxi, points, lvl - 1);
-                        if(someValue > max){
-                            max = someValue;
-                        }
-
-                        chessPieces.add(captured);
-                        cp.setPosition(xStart, yStart);
-                    }else{
-
-                        int someValue = moveAndDecide(chessPieces, !maxi, points, lvl - 1);
-                        if(someValue > max){
-                            max = someValue;
-                        }
-                        cp.setPosition(xStart, yStart);
-                    }
-
-                }
+    private static ChessPiece findCaptured(List<ChessPiece> chessPieces, boolean isWhite, int x, int y){
+        for(ChessPiece c : chessPieces){
+            if(c.isWhite() == isWhite && c.getXPos() == x && c.getYPos() == y){
+                return c;
             }
-
-            return max;
-        }else{
-            int min = 999_999;
-            // black player is minimizing
-            boolean [][] white = getWhite(chessPieces);
-
-            for(ChessPiece cp : chessPieces){
-                List<int []> moves = cp.getPossibleMoves(freeSpace, white);
-                int xStart = cp.getXPos(), yStart = cp.getYPos();
-
-                for(int [] m : moves){
-
-                    cp.setPosition(m[0], m[1]);
-
-                    if(white[m[0]][m[1]]){
-                        ChessPiece captured = null;
-                        // find captured
-                        for(ChessPiece c : chessPieces){
-                            if(c.isWhite() && c.getXPos() == m[0] && c.getYPos() == m[1]){
-                                captured = c;
-                                break;
-                            }
-                        }
-                        chessPieces.remove(captured);
-
-                        int someValue = moveAndDecide(chessPieces, !maxi, points, lvl - 1);
-                        if(someValue < min){
-                            min = someValue;
-                        }
-
-                        chessPieces.add(captured);
-                        cp.setPosition(xStart, yStart);
-                    }else{
-
-                        int someValue = moveAndDecide(chessPieces, !maxi, points, lvl - 1);
-                        if(someValue < min){
-                            min = someValue;
-                        }
-                        cp.setPosition(xStart, yStart);
-                    }
-                }
-            }
-            return min;
         }
+        return null;
     }
 
     private static void setupBoard(List<ChessPiece> chessPieces){
