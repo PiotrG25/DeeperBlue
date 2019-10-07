@@ -4,12 +4,77 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+//todo check
+//todo castling
+// Castling may only be performed if the king and rook involved have never previously been moved in the game, if the king is not in check, if the king would not travel through or into check, and if there are no pieces between the rook and the king
+
+//todo en passant
+//todo promotion
+
+
+//todo TODO
+// do it better
+// multithreading
+// do it faster
+// MFW
+// (┛ಠ_ಠ)┛彡┻━┻
+// ┬─┬﻿ ︵ /(.□. \）
+
+
 public class Main {
+    private static int maxLvl = 10; // o.0 why no work
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         List<ChessPiece> chessPieces = new ArrayList<>();
         setupBoard(chessPieces);
-        
+
+        System.out.println("1 if you are white player");
+        int x, y;
+        boolean whitePlayer = false;
+        x = sc.nextInt();
+        if(x == 1){
+            whitePlayer = true;
+        }
+        for(;;){
+            System.out.println("Input 9 to exit, 1 to generate");
+            x = sc.nextInt();
+            if(x == 9){
+                break;
+            }else if(x == 1){
+                if(whitePlayer){
+                    maximizingMove(chessPieces, 0, maxLvl);
+                }else{
+                    minimizingMove(chessPieces, 0, maxLvl);
+                }
+            }
+
+            ChessPiece cp = null, cp2 = null;
+
+            do{
+                x = sc.nextInt();
+                y = sc.nextInt();
+                for(ChessPiece c : chessPieces){
+                    if(c.getXPos() == x && c.getYPos() == y){
+                        cp = c;
+                        break;
+                    }
+                }
+                if(cp == null)
+                    System.out.println("cp is null");
+            }while(cp == null);
+
+            x = sc.nextInt();
+            y = sc.nextInt();
+            for(ChessPiece c : chessPieces){
+                if(c.getXPos() == x && c.getYPos() == y){
+                    cp2 = c;
+                    break;
+                }
+            }
+
+            chessPieces.remove(cp2);
+            cp.setPosition(x, y);
+        }
     }
 
     private static int maximizingMove(List<ChessPiece> chessPieces, int points, int lvl){
@@ -19,6 +84,8 @@ public class Main {
         boolean [][] black = getBlack(chessPieces);
 
         for(ChessPiece cp : chessPieces){
+            if(!cp.isWhite()) continue;
+
             List<int []> moves = cp.getPossibleMoves(freeSpace, black);
             int xStart = cp.getXPos(), yStart = cp.getYPos();
 
@@ -54,7 +121,7 @@ public class Main {
                 cp.setPosition(xStart, yStart);
             }
         }
-        if(lvl <= 1)
+        if(lvl == maxLvl)
             System.out.println("lvl " + lvl + " " + maxCommunicate);
         return max;
     }
@@ -66,6 +133,7 @@ public class Main {
 
         for(ChessPiece cp : chessPieces){
             if(cp.isWhite()) continue;
+
             List<int []> moves = cp.getPossibleMoves(freeSpace, white);
             int xStart = cp.getXPos(), yStart = cp.getYPos();
 
@@ -101,7 +169,7 @@ public class Main {
                 cp.setPosition(xStart, yStart);
             }
         }
-        if(lvl <= 1)
+        if(lvl == maxLvl)
             System.out.println("lvl " + lvl + " " + minCommunicate);
         return min;
     }
